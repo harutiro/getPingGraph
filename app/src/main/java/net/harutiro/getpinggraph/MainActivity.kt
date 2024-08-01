@@ -83,7 +83,7 @@ class MainActivity : ComponentActivity() {
                             onCheckedChange = { isStartFlag = it }
                         )
 
-                        Text(text = pingResult, modifier = Modifier.padding(innerPadding))
+//                        Text(text = pingResult, modifier = Modifier.padding(innerPadding))
 
                         // デバッグ用に結果を画面に表示
                         GraphScreen(pingList = pingList)
