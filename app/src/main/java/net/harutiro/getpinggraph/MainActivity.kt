@@ -25,6 +25,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.patrykandpatrick.vico.compose.axis.horizontal.rememberBottomAxis
 import com.patrykandpatrick.vico.compose.axis.vertical.rememberStartAxis
 import com.patrykandpatrick.vico.compose.chart.Chart
@@ -59,6 +60,8 @@ class MainActivity : ComponentActivity() {
                     var pingResult by remember { mutableStateOf("") }
                     val pingList = remember { mutableStateListOf<pingData>() }
 
+                    var pingDataText by remember { mutableStateOf("") }
+
                     LaunchedEffect(isStartFlag) {
                         // 1秒に一回呼び出し
                         while (isStartFlag) {
@@ -67,6 +70,7 @@ class MainActivity : ComponentActivity() {
                             val pingTime = extractPingTime(pingResult)
                             if (pingTime != null) {
                                 pingList.add(pingData(pingTime.toDouble(), System.currentTimeMillis()))
+                                pingDataText = pingTime
                             }
 
                             // 1秒待機
@@ -76,7 +80,11 @@ class MainActivity : ComponentActivity() {
                         pingList.clear()
                     }
 
-                    Column {
+                    Column(
+                        modifier = Modifier.fillMaxSize(),
+                        verticalArrangement = Arrangement.Center,
+                        horizontalAlignment = androidx.compose.ui.Alignment.CenterHorizontally
+                    ){
                         Switch(
                             modifier = Modifier.padding(top = 32.dp),
                             checked = isStartFlag,
@@ -84,6 +92,11 @@ class MainActivity : ComponentActivity() {
                         )
 
 //                        Text(text = pingResult, modifier = Modifier.padding(innerPadding))
+
+                        Text(
+                            text = "$pingDataText ms",
+                            fontSize = 24.sp
+                        )
 
                         // デバッグ用に結果を画面に表示
                         GraphScreen(pingList = pingList)
@@ -139,8 +152,13 @@ fun GraphScreen(
     pingList: List<pingData>
 ) {
     // pingListのpingだけを取り出す
-    val pingListPing = pingList.map { it.ping }
+    var pingListPing = pingList.map { it.ping }
     pingListPing.reversed()
+
+    // 末尾7件を取り出す
+    pingListPing = pingListPing.takeLast(7)
+
+
     val chartEntryModel = entryModelOf(*pingListPing.toTypedArray())
 
     val pingListDate = pingList.map { it.time }
